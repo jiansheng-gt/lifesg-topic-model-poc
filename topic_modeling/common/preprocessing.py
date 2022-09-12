@@ -1,14 +1,44 @@
-import logging
+import nltk
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4') # for wordnet lemmatizer
+
+from nltk.corpus import stopwords
+from nltk.stem.wordnet import WordNetLemmatizer
 from collections import defaultdict
 
-# remove common words and tokenize
-stoplist = set('for a of the and to in'.split())
+# stopwords, might want to extend
+en_stop = stopwords.words('english')
+# en_stop = set('for a of the and to in'.split())
 
-# TODO: proper processing
+def tokenize(text):
+    return text.lower().split()
+
+def get_lemma(word):
+    return WordNetLemmatizer().lemmatize(word)
+
+# TODO: WIP proper processing
 def preprocess(documents):
+
+    # tokenize
+    texts = [tokenize(document) for document in documents]
+
+    # remove special characters
+
+    # bigrams?
+
+    # stem - root of words
+
+    # lemmatize - same meaning words
     texts = [
-        [word for word in document.lower().split() if word not in stoplist]
-        for document in documents
+        [get_lemma(token) for token in text]
+        for text in texts
+    ]
+
+    # filter stop words
+    texts = [
+        [token for token in text if token not in en_stop]
+        for text in texts
     ]
 
     # remove words that appear only once
