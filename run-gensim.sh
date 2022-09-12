@@ -1,1 +1,1 @@
-python3 gensim/start.py
+python3 topic_modeling/gensim/start.py
