@@ -1,0 +1,17 @@
+{
+  "name": "mol-web-crawl",
+  "version": "1.0.0",
+  "description": "A web scraper tool to extract textual content from web pages",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "cheerio": "^1.0.0-rc.12"
+  }
+}
