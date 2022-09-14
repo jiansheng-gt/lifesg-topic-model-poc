@@ -44,8 +44,9 @@ const scrapeExternalLinks = async (links, $, writeStream) => {
       !url ||
       IGNORE_LINKS.includes(url) ||
       !url.startsWith("http") ||
-      url.endsWith("png") ||
-      url.endsWith("pdf") ||
+      url.includes(".png") ||
+      url.includes(".jpg") ||
+      url.includes(".pdf") ||
       url.includes("services2.hdb.gov.sg")
     ) {
       continue;
@@ -110,7 +111,7 @@ const fetchData = async (url) => {
 async function main() {
   for (let guide = 0; guide < GUIDE_URLS.length; guide++) {
     //   create file stream
-    const writeStream = fs.createWriteStream(`data-inner-text/Guide ${guide + 1}.txt`);
+    const writeStream = fs.createWriteStream(`../data/Guide ${guide + 1}.txt`);
     await scrapeData(GUIDE_URLS[guide], writeStream);
 
     // fs.writeFileSync(`data/Guide ${guide + 1}.txt`, text);

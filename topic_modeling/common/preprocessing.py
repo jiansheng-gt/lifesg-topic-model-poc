@@ -1,8 +1,10 @@
+import re
 import nltk
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('omw-1.4') # for wordnet lemmatizer
 
+from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from collections import defaultdict
@@ -17,6 +19,9 @@ def tokenize(text):
 def get_lemma(word):
     return WordNetLemmatizer().lemmatize(word)
 
+def get_stem(word):
+    return PorterStemmer().stem(word)
+
 # TODO: WIP proper processing
 def preprocess(documents):
 
@@ -24,10 +29,15 @@ def preprocess(documents):
     texts = [tokenize(document) for document in documents]
 
     # remove special characters
+    texts = [re.sub('[^A-Za-z0-9.]+', ' ', document) for document in documents]
 
     # bigrams?
 
     # stem - root of words
+    # texts = [
+    #     [get_stem(token) for token in text]
+    #     for text in texts
+    # ]
 
     # lemmatize - same meaning words
     texts = [
