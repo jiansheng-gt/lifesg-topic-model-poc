@@ -49,7 +49,7 @@ corpus = [dictionary.doc2bow(text) for text in texts] # bag of words
 pickle.dump(corpus, open(os.path.join(OUTPUT_DIR, 'corpus.pkl'), 'wb'))
 
 logging.info('Running LDA model...');
-model = models.LdaModel(corpus, id2word=dictionary, num_topics=10, passes=15, iterations=200)
+model = models.LdaModel(corpus, id2word=dictionary, num_topics=5, passes=15, iterations=200)
 model.save(os.path.join(OUTPUT_DIR, 'model'))
 
 logging.info('COMPELTED!');
