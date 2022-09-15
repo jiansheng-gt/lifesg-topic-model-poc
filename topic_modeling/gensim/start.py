@@ -1,4 +1,5 @@
 import os
+import pickle
 import sys
 sys.path.append(os.getcwd())
 
@@ -10,7 +11,11 @@ from topic_modeling.common.preprocessing import preprocess
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
+OUTPUT_DIR = 'output'
+
+logging.info('Reading data...');
 documents = DataReader('data')
+logging.info('Reading data DONE');
 
 # documents = [
 #     "Human machine interface for lab abc computer applications",
@@ -24,14 +29,26 @@ documents = DataReader('data')
 #     "Graph minors A survey",
 # ]
 
+logging.info('Processing documents...');
 texts = preprocess(documents)
 
+text_str = '';
+for text in texts:
+	text_str += ' '.join(text) + '\n'
+open(os.path.join(OUTPUT_DIR, 'tokens.txt'), 'w').write(text_str)
+logging.info('Processing documents DONE');
+
+logging.info('Creating dictionary...');
 dictionary = corpora.Dictionary(texts)
+dictionary.save(os.path.join(OUTPUT_DIR, 'dictionary'))
 
-pprint.pprint(dictionary)
-
+logging.info('Creating BOW...');
 corpus = [dictionary.doc2bow(text) for text in texts] # bag of words
+pickle.dump(corpus, open(os.path.join(OUTPUT_DIR, 'corpus.pkl'), 'wb'))
 
-model = models.LdaModel(corpus, id2word=dictionary, num_topics=2)
+logging.info('Running LDA model...');
+model = models.LdaModel(corpus, id2word=dictionary, num_topics=20, passes=15)
+model.save(os.path.join(OUTPUT_DIR, 'model'))
 
-pprint.pprint(model)
+logging.info('COMPELTED!');
+pprint.pprint(model.print_topics())
