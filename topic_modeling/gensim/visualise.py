@@ -18,10 +18,10 @@ pyLDAvis.save_html(lda_display, os.path.join(OUTPUT_DIR, 'visualisation.html'))
 topics = lda.get_document_topics(corpus)
 document_topics = ''
 for index, name in enumerate(document_names):
-	document_topics += 'Document: ' + name + '\n'
-	for topic_id, perc in topics[index]:
-		document_topics += 'Topic ' + str(topic_id) + ' [' + str(perc) + ']:\n'
-		document_topics += str(lda.show_topic(topic_id)) + '\n'
-	document_topics += '\n'
+  document_topics += 'Document: ' + name + '\n'
+  for topic_id, perc in topics[index]:
+    document_topics += 'Topic ' + str(topic_id) + ' [' + str(perc) + ']:\n'
+    document_topics += str(lda.show_topic(topic_id)) + '\n'
+  document_topics += '\n'
 
 open(os.path.join(OUTPUT_DIR, 'document_topics.txt'), 'w').write(document_topics)
