@@ -38,4 +38,8 @@ export const IGNORE_LINKS = [
   "https://play.google.com/store/apps/details?id=sg.gov.app.mol&hl=en_SG",
   "https://tech.gov.sg/report_vulnerability",
   "https://www.gov.sg",
+  "https://t.me/OMWNetworkConnects",
+  "https://www.nyc.gov.sg/omw/letstalk",
+  "https://www.nyc.gov.sg/omw/connect",
+  "https://www.tal.sg/tadm/know-your-options",
 ];
