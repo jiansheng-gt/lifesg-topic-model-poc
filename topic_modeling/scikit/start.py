@@ -38,12 +38,13 @@ tf_feature_names = tf_vectorizer.get_feature_names_out()
 no_topics = 10
 
 print('Running LDA model...');
-lda = LatentDirichletAllocation(n_components=no_topics, max_iter=5, learning_method='online', learning_offset=50.,random_state=0).fit(tf)
+lda = LatentDirichletAllocation(n_components=no_topics, max_iter=15, max_doc_update_iter=200).fit(tf)
 
 print('COMPELTED!');
 no_top_words = 10
 display_topics(lda, tf_feature_names, no_top_words)
 
+# document topic distribution
+# lda.transform(tf)
 
-with open('sklearn_model.pkl', 'wb') as fout:
-    pickle.dump((tf_vectorizer, tf, lda), fout)
+pickle.dump((tf_vectorizer, tf, lda), open(os.path.join(OUTPUT_DIR, 'sklearn_model.pkl'), 'wb'))
