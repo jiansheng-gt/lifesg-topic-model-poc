@@ -33,11 +33,18 @@ const scrapeData = async (url, writeStream) => {
   }
 
   // Append spaces in between elements to prevent text clumping
-  $("body").each(function () {
+  $("*").each(function () {
     $(this).append(" ");
   });
 
-  writeStream.write(pageData.text());
+  // Remove suggested pages section
+  $("div[class*=suggested-page]").remove();
+  let content = pageData.text();
+  while (content.indexOf("You may also be interested in") > -1) {
+    content = content.replace("You may also be interested in", "");
+  }
+
+  writeStream.write(content);
   console.log("Crawling data in external links...");
   await scrapeExternalLinks(links, $, writeStream);
 };
