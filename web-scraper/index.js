@@ -9,6 +9,7 @@ const SCRAPER_API_KEY = "<SCRAPER_API_KEY>";
 
 let browser;
 let page;
+let document = 1;
 
 const scrapeData = async (url, writeStream) => {
   const html = await fetchData(url);
@@ -44,7 +45,11 @@ const scrapeData = async (url, writeStream) => {
     content = content.replace("You may also be interested in", "");
   }
 
-  writeStream.write(content);
+  // writeStream.write(content);
+  if (content.trim() !== "") {
+    fs.writeFileSync(`data/Document ${document}.txt`, content, { flag: "w" });
+    document++;
+  }
   console.log("Crawling data in external links...");
   await scrapeExternalLinks(links, $, writeStream);
 };
@@ -87,7 +92,11 @@ const scrapeExternalLinks = async (links, $, writeStream) => {
       $("noscript").remove();
 
       // writeStream.write(url);
-      writeStream.write($("body").text());
+      // writeStream.write($("body").text());
+      if ($("body").text().trim() !== "") {
+        fs.writeFileSync(`data/Document ${document}.txt`, $("body").text().trim());
+        document++;
+      }
       // writeStream.write($("body").prop("innerText") || "");
     }
   }
@@ -126,13 +135,14 @@ async function main() {
   page = await browser.newPage();
 
   for (let guide = 0; guide < GUIDE_URLS.length; guide++) {
-    //   create file stream
-    const writeStream = fs.createWriteStream(`../data/Guide ${guide + 1}.txt`);
+    // //   create file stream
+    // const writeStream = fs.createWriteStream(`../data/Guide ${guide + 1}.txt`);
+    let writeStream;
     console.log(`Crawling data in internal guide...`);
     await scrapeData(GUIDE_URLS[guide], writeStream);
 
     // fs.writeFileSync(`data/Guide ${guide + 1}.txt`, text);
-    writeStream.close();
+    // writeStream.close();
   }
 
   await browser.close();
