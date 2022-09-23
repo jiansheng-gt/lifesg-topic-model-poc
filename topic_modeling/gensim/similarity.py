@@ -1,7 +1,14 @@
+import logging
+from multiprocessing import freeze_support
 import os
+import sys
+
+sys.path.append(os.getcwd())
 import pickle
-from gensim import models, matutils
+from gensim import corpora, models, matutils
 import json
+
+from topic_modeling.common.data_reader import DataReader
 
 GUIDE_URLS = [
     "/guides/having-a-baby",
@@ -33,28 +40,68 @@ def get_guide_name(document_name):
     return GUIDE_URLS[guide_num - 1]
 
 OUTPUT_DIR = 'output'
+NUM_TOPICS = 13
+COHERENCE_MEASURE = 'c_v' # either c_v or u_mass
 
-document_names = open(os.path.join(OUTPUT_DIR, 'document_names.txt')).read().split('\n')
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.DEBUG)
+
+dictionary: corpora.Dictionary = corpora.Dictionary.load(os.path.join(OUTPUT_DIR, 'dictionary'))
+texts_training = pickle.load(open(os.path.join(OUTPUT_DIR, 'texts-training.pkl'), 'rb'))
 corpus = pickle.load(open(os.path.join(OUTPUT_DIR, 'corpus.pkl'), 'rb'))
-lda = models.ldamodel.LdaModel.load(os.path.join(OUTPUT_DIR, 'model'))
 
-doc_sims = {}
-for index, name in enumerate(document_names):
-    similarity = []
+if __name__ == "__main__":
+    freeze_support()
 
-    curr_doc = lda.get_document_topics(corpus[index], minimum_probability=0)
+    # iterate 10 times to get best coherence score
+    lda: models.LdaModel = None
+    best_score = float('-inf')
+    for i in range(10):
+        print('Iteration:', i)
+        curr_lda = models.LdaModel(corpus, id2word=dictionary, num_topics=NUM_TOPICS, passes=100, iterations=400, alpha='auto', eta='auto', eval_every=None)
 
-    for comp_index, comp_name in enumerate(document_names):
-        if index == comp_index:
-            continue
-        comp_doc = lda.get_document_topics(corpus[comp_index], minimum_probability=0)
-        sim = matutils.cossim(curr_doc, comp_doc)
-        similarity.append(tuple([get_guide_name(comp_name), sim]))
+        curr_score = models.CoherenceModel(model=curr_lda, texts=texts_training, topn=25, coherence=COHERENCE_MEASURE).get_coherence()
+        print('curr_score:', curr_score)
 
-    sorted_similar = sorted(similarity, key = lambda x: x[1], reverse=True)
-    # sort by highest similarity
-    doc_sims[get_guide_name(name)] = tuple(sorted_similar)
+        if curr_score > best_score:
+            lda = curr_lda
+            best_score = curr_score
+    print('highest score:', best_score)
 
-result = json.dumps(doc_sims, indent = 4)
+    # Similarity for full guide data using best model
+    full_texts = pickle.load(open(os.path.join(OUTPUT_DIR, 'texts.pkl'), 'rb'))
+    full_texts_list = [dictionary.doc2bow(text) for text in full_texts]
+    document_names = pickle.load(open(os.path.join(OUTPUT_DIR, 'document_names.pkl'), 'rb'))
 
-open(os.path.join(OUTPUT_DIR, 'doc_similarity.txt'), 'w').write(result)
+    doc_sims = {}
+    sim_cache = {}
+    for index, name in enumerate(document_names):
+        similarity = []
+        curr_guide_name = get_guide_name(name)
+        logging.info('calculating similarity for guide: ' + curr_guide_name)
+
+        curr_doc = lda.get_document_topics(full_texts_list[index], minimum_probability=0)
+
+        for comp_index, comp_name in enumerate(document_names):
+            if index == comp_index:
+                continue
+
+            comp_guide_name = get_guide_name(comp_name)
+
+            sim = 0
+            if str(index) + ',' + str(comp_index) in sim_cache:
+                sim = sim_cache[str(index) + ',' + str(comp_index)]
+            else:
+                comp_doc = lda.get_document_topics(full_texts_list[comp_index], minimum_probability=0)
+                sim = matutils.cossim(curr_doc, comp_doc)
+                sim_cache[str(index) + ',' + str(comp_index)] = sim
+                sim_cache[str(comp_index) + ',' + str(index)] = sim
+
+            if sim > 0.5:
+                similarity.append(tuple([comp_guide_name, sim]))
+
+        # sort by highest similarity
+        sorted_similar = sorted(similarity, key = lambda x: x[1], reverse=True)
+        doc_sims[curr_guide_name] = tuple(sorted_similar)
+
+    result = json.dumps(doc_sims, indent = 4)
+    open(os.path.join(OUTPUT_DIR, 'doc_similarity.json'), 'w').write(result)
