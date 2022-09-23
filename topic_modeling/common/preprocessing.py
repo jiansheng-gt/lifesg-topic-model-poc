@@ -9,6 +9,7 @@ from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from collections import defaultdict
+from gensim.models import Phrases, phrases
 
 # spacy nlp
 parser = spacy.load('en_core_web_sm')
@@ -46,13 +47,21 @@ def preprocess(documents):
     # tokenize
     texts = [tokenize(document) for document in documents]
 
+    # Compute bigrams.
+    # Add bigrams and trigrams to docs (only ones that appear 20 times or more).
+    bigrams = Phrases(texts, min_count=20, connector_words=phrases.ENGLISH_CONNECTOR_WORDS)
+    trigrams = Phrases(bigrams[texts], min_count=20, connector_words=phrases.ENGLISH_CONNECTOR_WORDS)
+    for idx in range(len(texts)):
+        for token in trigrams[bigrams[texts[idx]]]:
+            if '_' in token:
+                # Token is a bigram, add to document.
+                texts[idx].append(token)
+
     # remove single characters
     texts = [
         [token for token in text if len(token) > 1]
         for text in texts
     ]
-
-    # bigrams?
 
     # stem - root of words
     # texts = [
