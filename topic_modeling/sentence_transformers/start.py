@@ -37,21 +37,37 @@ GUIDE_URLS = [
     "/guides/bringing-newborn-home",
 ];
 OUTPUT_DIR = 'output'
+CHUNK_SIZE = 500
+model.max_seq_length = 512
 
 def get_guide_name(document_name):
     guide_num = int(document_name.split()[1].split('.')[0])
     return GUIDE_URLS[guide_num - 1]
 
-documents = DataReader('data')
-texts = list(documents)
-filenames = documents.filenames
+logging.info('Reading data...')
+doc_reader = DataReader('data')
+documents = list(doc_reader)
+filenames = doc_reader.filenames
 
-embeddings = model.encode(texts)
+logging.info('Splitting texts into chunks...')
+texts_chunked = []
+for doc_num in range(len(documents)):
+    doc_chunked = []
+    doc_words = documents[doc_num].split()
+    for i in range(0, len(doc_words), CHUNK_SIZE):
+        doc_chunked.append(' '.join(doc_words[i:i + CHUNK_SIZE]))
+    texts_chunked.append(doc_chunked)
 
+logging.info('Calculating mean embeddings...')
+embeddings = []
+for text_chunked in texts_chunked:
+    chunk_sims = model.encode(text_chunked)
+    encoding_mean = chunk_sims.mean(0)
+    embeddings.append(encoding_mean)
 
+logging.info('Caclculating cosine similarity...')
 doc_sims = {}
 similarities = util.cos_sim(embeddings, embeddings)
-
 for index, name in enumerate(filenames):
     similarity = []
     curr_guide_name = get_guide_name(name)
@@ -64,8 +80,9 @@ for index, name in enumerate(filenames):
 
         sim = similarities[index][comp_index]
 
-        if sim > 0.5:
-            similarity.append(tuple([comp_guide_name, sim.item()]))
+        # Filter if needed
+        # if sim > 0.5:
+        similarity.append(tuple([comp_guide_name, sim.item()]))
 
     # sort by highest similarity
     sorted_similar = sorted(similarity, key = lambda x: x[1], reverse=True)
@@ -73,3 +90,4 @@ for index, name in enumerate(filenames):
 
 result = json.dumps(doc_sims, indent = 4)
 open(os.path.join(OUTPUT_DIR, 'doc_similarity.json'), 'w').write(result)
+logging.info('Done!')
