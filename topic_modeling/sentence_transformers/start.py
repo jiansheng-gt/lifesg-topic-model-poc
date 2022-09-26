@@ -9,7 +9,12 @@ from sentence_transformers import SentenceTransformer, util
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.DEBUG)
 
-# all-MiniLM-L6-v2 not as accurate
+# all-MiniLM-L6-v2 vs all-mpnet-base-v2
+# all-mpnet-base-v2 is more accurate
+#
+# Speed on full guide data:
+# all-MiniLM-L6-v2 - 42 seconds
+# all-mpnet-base-v2 - 2 min 22 seconds
 model = SentenceTransformer('all-mpnet-base-v2')
 
 GUIDE_URLS = [
