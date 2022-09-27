@@ -1,31 +1,63 @@
+import { useEffect, useState } from "react";
 import { Link, LinkContainer } from "./app.styles";
 
+interface RecData {
+  id: number;
+  sim: number;
+  title: string;
+  url: string;
+}
+
+const getClicks = () => JSON.parse(sessionStorage.getItem("clicks") || "{}")
+
 const App = () => {
-  const links = ["baby", "newborn", "nanny", "car", "petrol", "speed", "elderly", "disease", "caregiver"];
+  const [data, setData] = useState<RecData[] | null>(null);
 
-  const onClickLink = (link: string) => {
+  const fetchData = () => {
+    fetch("http://127.0.0.1:5000/guide-recs", {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(getClicks())
+    }).then((res) => res.json())
+      .then(data => setData(data))
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, [])
+
+  const onClickLink = (id: number) => {
     // get links clicked from session
-    const clicks = JSON.parse(sessionStorage.getItem("clicks") || "{}");
+    const clicks = getClicks();
 
-    console.log("link", clicks[link], link);
+    console.log("link", clicks[id], id);
 
-    if (clicks[link]) {
-      clicks[link] = clicks[link] + 1;
+    if (clicks[id]) {
+      clicks[id] = clicks[id] + 1;
     } else {
-      clicks[link] = 1;
+      clicks[id] = 1;
     }
 
     console.log(clicks);
     // set clicks in session
     sessionStorage.setItem("clicks", JSON.stringify(clicks));
+    fetchData()
   };
 
   const renderLinks = () => {
+    if (!data) return null;
+
     return (
       <LinkContainer>
-        {links.map((link) => (
-          <Link onClick={() => onClickLink(link)} key={link}>
-            {link}
+        {data.map(({ id, title, url, sim }) => (
+          <Link onClick={() => onClickLink(id)} key={id}>
+            {title}
+            <br />
+            <br />
+            Similarity: {sim}
           </Link>
         ))}
       </LinkContainer>

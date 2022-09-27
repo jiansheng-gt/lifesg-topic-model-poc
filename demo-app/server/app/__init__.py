@@ -22,6 +22,18 @@ def create_app():
         # TODO: handle empty body
         data = request.get_json(silent=True)
 
+        print(data)
+        if not data:
+            user_recs = []
+            for index, row in embeddings.iterrows():
+                user_recs.append({
+                    'id': index,
+                    'title': row.guide_name,
+                    'url': row.url,
+                    'sim': 0
+                })
+            return user_recs
+
         # 1 click = 1 embedding
         user_embeddings = []
         for guide_id, clicks in data.items():
