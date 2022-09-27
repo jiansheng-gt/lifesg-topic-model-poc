@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, LinkContainer } from "./app.styles";
+import { LinkContainer, Page } from "./app.styles";
+import { Card } from "./components/Card";
 
 interface RecData {
   id: number;
@@ -53,19 +54,19 @@ const App = () => {
     return (
       <LinkContainer>
         {data.map(({ id, title, url, sim }) => (
-          <Link onClick={() => onClickLink(id)} key={id}>
-            {title}
-            <br />
-            <br />
-            Similarity: {sim}
-          </Link>
+          <Card
+            key={id}
+            title={title}
+            onClick={() => onClickLink(id)}
+            subtext={`Similarity: ${(sim * 100).toFixed(2) + '%'}`}
+          />
         ))}
       </LinkContainer>
     );
   };
   return (
     <div className="App">
-      <header className="App-header">{renderLinks()}</header>
+      <Page className="App-header">{renderLinks()}</Page>
     </div>
   );
 };
