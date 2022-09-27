@@ -16,7 +16,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "init:server": "virtualenv venv",
+    "install:server": "pip install -r requirements.txt",
+    "start:server": "flask --app server/app --debug run"
   },
   "eslintConfig": {
     "extends": [
