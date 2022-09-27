@@ -1,0 +1,37 @@
+{
+	"compilerOptions": {
+		// TODO: added for domain objects. to remove when api-contract is fully up
+		"experimentalDecorators": true,
+		"sourceMap": true,
+		"baseUrl": ".",
+		"target": "es5",
+		"lib": [
+			"dom",
+			"dom.iterable",
+			"esnext"
+		],
+		"allowJs": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"module": "esnext",
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		//FIXME: noEmit must be disabled when running load test
+		"noEmit": false,
+		"jsx": "preserve",
+		"incremental": true
+	},
+	"exclude": [
+		"node_modules"
+	],
+	"include": [
+		"next-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		"next.config.js"
+	]
+}
