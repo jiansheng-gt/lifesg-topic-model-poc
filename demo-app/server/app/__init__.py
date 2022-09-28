@@ -1,6 +1,5 @@
 import os
 from flask import request, Flask
-from flask_cors import CORS
 import pandas as pd
 from sentence_transformers import util
 import numpy as np
@@ -10,13 +9,12 @@ CSV_PATH = '../data/embeddings.csv'
 def create_app():
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-    CORS(app)
 
     embeddings = pd.read_csv(os.path.join(app.root_path, CSV_PATH))
     embeddings.embedding = embeddings.embedding.apply(lambda x: np.array(x.split()).astype(np.float64))
 
     # a simple page that says hello
-    @app.route('/guide-recs', methods=['POST'])
+    @app.route('/api/guide-recs', methods=['POST'])
     def guide_recs():
         # get user clicks (req body)
         # TODO: handle empty body
