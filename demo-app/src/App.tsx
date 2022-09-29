@@ -9,7 +9,7 @@ interface RecData {
   url: string;
 }
 
-const getClicks = () => JSON.parse(sessionStorage.getItem("clicks") || "{}")
+const getClicks = () => JSON.parse(sessionStorage.getItem("clicks") || "{}");
 
 const App = () => {
   const [data, setData] = useState<RecData[] | null>(null);
@@ -18,17 +18,18 @@ const App = () => {
     fetch("/api/guide-recs", {
       method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(getClicks())
-    }).then((res) => res.json())
-      .then(data => setData(data))
-  }
+      body: JSON.stringify(getClicks()),
+    })
+      .then((res) => res.json())
+      .then((data) => setData(data));
+  };
 
   useEffect(() => {
     fetchData();
-  }, [])
+  }, []);
 
   const onClickLink = (id: number) => {
     // get links clicked from session
@@ -45,20 +46,25 @@ const App = () => {
     console.log(clicks);
     // set clicks in session
     sessionStorage.setItem("clicks", JSON.stringify(clicks));
-    fetchData()
+    fetchData();
   };
 
-  const renderLinks = () => {
+  const renderLinks = (read: boolean) => {
     if (!data) return null;
+
+    const clicks = getClicks();
+    let filteredData = data.filter(({ id }) => !!clicks[id] === read);
 
     return (
       <LinkContainer>
-        {data.map(({ id, title, url, sim }) => (
+        {filteredData.map(({ id, title, url, sim }) => (
           <Card
             key={id}
             title={title}
             onClick={() => onClickLink(id)}
-            subtext={`Similarity: ${(sim * 100).toFixed(2) + '%'}`}
+            {...(!read && {
+              subtext: `Similarity: ${(sim * 100).toFixed(2) + "%"}`,
+            })}
           />
         ))}
       </LinkContainer>
@@ -66,7 +72,12 @@ const App = () => {
   };
   return (
     <div className="App">
-      <Page className="App-header">{renderLinks()}</Page>
+      <Page className="App-header">
+        <h3>Read articles</h3>
+        {renderLinks(true)}
+        <h3>Suggested articles</h3>
+        {renderLinks(false)}
+      </Page>
     </div>
   );
 };
