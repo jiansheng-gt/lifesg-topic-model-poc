@@ -21,21 +21,28 @@ items = [1, 2, 3, 5, 10]
 data = []
 for user in users:
     for item in items:
-        # read = 0
+        read = 0
         if item in read_data[user]:
             read = 1
-            data.append([user, item, read])
+        data.append([user, item, read])
 # load data in pandas
 df = pd.DataFrame(data)
 print(df)
 
+ratings_dict = {
+    "item": [1, 5, 10, 3, 5, 10, 10, 1, 3, 5, 2, 10],
+    "user": ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'D', 'D', 'D', 'E', 'E'],
+    "rating": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.1],
+}
+
+df = pd.DataFrame(ratings_dict)
 reader = Reader(rating_scale=(0, 1))
-data = Dataset.load_from_df(df, reader)
+data = Dataset.load_from_df(df[["user", "item", "rating"]], reader)
 
 # To use item-based cosine similarity
 sim_options = {
     "name": "cosine",
-    "user_based": False,  # Compute  similarities between items
+    "user_based": True,  # Compute  similarities between items
 }
 algo = KNNWithMeans(sim_options=sim_options)
 trainingSet = data.build_full_trainset()
