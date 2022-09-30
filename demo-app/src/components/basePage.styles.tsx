@@ -13,6 +13,10 @@ export const NavBarItem = styled.li`
   float: left;
 `;
 
+export const NavBarItemRight = styled.li`
+  float: right;
+`;
+
 export const NavBarLink = styled(Link)`
   display: block;
   color: white;

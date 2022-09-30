@@ -7,7 +7,7 @@ import { RecData } from "src/types";
 import { getClicksSummary } from "src/util/clicks";
 import { storage } from "src/util/storage";
 
-const HomeComponent = () => {
+const Top5Component = () => {
   const [data, setData] = useState<RecData[] | null>(null);
 
   const fetchData = () => {
@@ -27,7 +27,9 @@ const HomeComponent = () => {
     if (!data) return null;
 
     const clicks = getClicksSummary();
-    let filteredData = data.filter(({ id }) => !!clicks[id] === read);
+    let filteredData = data
+      .filter(({ id }) => !!clicks[id] === read)
+      .slice(0, 5);
 
     return (
       <LinkContainer>
@@ -47,13 +49,13 @@ const HomeComponent = () => {
   return (
     <div className="App">
       <Page className="App-header">
+        <h3>Top 5 articles</h3>
+        {renderLinks(false)}
         <h3>Read articles</h3>
         {renderLinks(true)}
-        <h3>Suggested articles</h3>
-        {renderLinks(false)}
       </Page>
     </div>
   );
 };
 
-export const Home = withBasePage(HomeComponent);
+export const Top5 = withBasePage(Top5Component);

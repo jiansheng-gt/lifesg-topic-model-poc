@@ -1,6 +1,7 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Home } from "./pages/Home";
+import { Top5 } from "./pages/Top5";
 
 const router = createBrowserRouter([
   {
@@ -9,7 +10,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/top-5",
-    element: <Home />,
+    element: <Top5 />,
   },
 ]);
 
