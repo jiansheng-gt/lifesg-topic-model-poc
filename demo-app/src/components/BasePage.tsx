@@ -21,6 +21,9 @@ export const BasePage = ({ children }: Props) => {
           <NavBarItem>
             <NavBarLink to="/top-5">Top 5</NavBarLink>
           </NavBarItem>
+          <NavBarItem>
+            <NavBarLink to="/temporal">Temporal</NavBarLink>
+          </NavBarItem>
           <NavBarItemRight>
             <NavBarLink onClick={storage.clearClicks} to="#">
               CLEAR STORE
