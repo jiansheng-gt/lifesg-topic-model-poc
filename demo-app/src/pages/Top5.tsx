@@ -27,9 +27,11 @@ const Top5Component = () => {
     if (!data) return null;
 
     const clicks = getClicksSummary();
-    let filteredData = data
-      .filter(({ id }) => !!clicks[id] === read)
-      .slice(0, 5);
+    let filteredData = data.filter(({ id }) => !!clicks[id] === read);
+
+    if (!read) {
+      filteredData = filteredData.slice(0, 5);
+    }
 
     return (
       <LinkContainer>
