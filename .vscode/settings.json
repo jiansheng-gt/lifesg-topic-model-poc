@@ -1,0 +1,35 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+	"[sql]": {
+		"editor.formatOnSave": false
+	},
+	"auto-close-tag.activationOnLanguage": [
+		"html",
+		"javascriptreact",
+		"typescriptreact"
+	],
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true
+	},
+	"editor.detectIndentation": false,
+	"editor.formatOnSave": true,
+	"javascript.format.enable": false,
+	"typescript.format.enable": false,
+	"javascript.validate.enable": false,
+	"editor.insertSpaces": false,
+	"editor.snippetSuggestions": "top",
+	"files.insertFinalNewline": true,
+	"files.trimTrailingWhitespace": true,
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
+}
