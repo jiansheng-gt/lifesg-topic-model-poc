@@ -1,3 +1,4 @@
+import React from "react";
 import {
   NavBar,
   NavBarItem,
@@ -5,12 +6,14 @@ import {
   NavBarLink,
 } from "./basePage.styles";
 import { storage } from "../util/storage";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   children: JSX.Element;
 }
 
 export const BasePage = ({ children }: Props) => {
+  const navigate = useNavigate();
   return (
     <>
       <nav>
@@ -25,7 +28,13 @@ export const BasePage = ({ children }: Props) => {
             <NavBarLink to="/temporal">Temporal</NavBarLink>
           </NavBarItem>
           <NavBarItemRight>
-            <NavBarLink onClick={storage.clearClicks} to="#">
+            <NavBarLink
+              onClick={() => {
+                storage.clearClicks();
+                navigate(0);
+              }}
+              to="#"
+            >
               CLEAR STORE
             </NavBarLink>
           </NavBarItemRight>
