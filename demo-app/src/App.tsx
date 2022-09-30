@@ -1,85 +1,20 @@
-import { useEffect, useState } from "react";
-import { LinkContainer, Page } from "./app.styles";
-import { Card } from "./components/Card";
+import React from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Home } from "./pages/Home";
 
-interface RecData {
-  id: number;
-  sim: number;
-  title: string;
-  url: string;
-}
-
-const getClicks = () => JSON.parse(sessionStorage.getItem("clicks") || "{}");
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/top-5",
+    element: <Home />,
+  },
+]);
 
 const App = () => {
-  const [data, setData] = useState<RecData[] | null>(null);
-
-  const fetchData = () => {
-    fetch("/api/guide-recs", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(getClicks()),
-    })
-      .then((res) => res.json())
-      .then((data) => setData(data));
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const onClickLink = (id: number) => {
-    // get links clicked from session
-    const clicks = getClicks();
-
-    console.log("link", clicks[id], id);
-
-    if (clicks[id]) {
-      clicks[id] = clicks[id] + 1;
-    } else {
-      clicks[id] = 1;
-    }
-
-    console.log(clicks);
-    // set clicks in session
-    sessionStorage.setItem("clicks", JSON.stringify(clicks));
-    fetchData();
-  };
-
-  const renderLinks = (read: boolean) => {
-    if (!data) return null;
-
-    const clicks = getClicks();
-    let filteredData = data.filter(({ id }) => !!clicks[id] === read);
-
-    return (
-      <LinkContainer>
-        {filteredData.map(({ id, title, url, sim }) => (
-          <Card
-            key={id}
-            title={title}
-            onClick={() => onClickLink(id)}
-            {...(!read && {
-              subtext: `Similarity: ${(sim * 100).toFixed(2) + "%"}`,
-            })}
-          />
-        ))}
-      </LinkContainer>
-    );
-  };
-  return (
-    <div className="App">
-      <Page className="App-header">
-        <h3>Read articles</h3>
-        {renderLinks(true)}
-        <h3>Suggested articles</h3>
-        {renderLinks(false)}
-      </Page>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;
