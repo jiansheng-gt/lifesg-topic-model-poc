@@ -24,6 +24,20 @@ source venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
+# Web scraper
+
+1. Install dependencies
+
+```
+npm ci
+```
+
+2. Run web scraper
+
+```
+npm start
+```
+
 # Gensim
 
 1. Create dictionary and Bag of Words
@@ -48,6 +62,34 @@ python topic_modeling/gensim/similarity.py
 
 ```
 python topic_modeling/gensim/visualise.py
+```
+
+# Scikit Learn
+
+1. Create document-term matrix, vectorizer and lda model
+
+```
+python topic_modeling/scikit/start.py
+```
+
+The following scripts use the document-term matrix, vectorizer and lda model saved from the previous step.
+
+2. Calculate coherence for varying number of topics
+
+```
+python topic_modeling/scikit/compute_coherence.py
+```
+
+3. Compute similarity between guides
+
+```
+python topic_modeling/scikit/similarity.py
+```
+
+4. Visualisation of topics
+
+```
+python topic_modeling/scikit/visualise.py
 ```
 
 # Sentence Transformers
