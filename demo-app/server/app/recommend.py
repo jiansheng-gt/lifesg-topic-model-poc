@@ -12,18 +12,19 @@ def get_recs(embeddings: pd.DataFrame, user_clicks):
             user_recs.loc[index] = [index, row.guide_name, row.url, 0]
         return user_recs
 
-    # 1 click = 1 embedding
-    user_embeddings = []
-    for guide_id, clicks in user_clicks.items():
-        for i in range(clicks):
-            user_embeddings.append(embeddings.loc[int(guide_id)].embedding)
 
-    user_embeddings_mean = np.array(user_embeddings).mean(0)
+    # user embeddings - dot product of user interests with guide embeddings
+    user_ratings = pd.DataFrame(np.zeros((len(embeddings), 1)), columns=['rating'])
+    for guide_id, clicks in user_clicks.items():
+      user_ratings.at[int(guide_id), 'rating'] = clicks
+
+    guide_embeddings = embeddings.loc[:, 'embedding'].to_numpy()
+    user_embeddings = guide_embeddings.dot(user_ratings)[0]
 
     user_recs = pd.DataFrame([], columns=rec_cols)
     # calculate cos sim
     for index, row in embeddings.iterrows():
-        sim = util.cos_sim([user_embeddings_mean], [row.embedding])
+        sim = util.cos_sim([user_embeddings], [row.embedding])
 
         user_recs.loc[index] = {
             'id': index,
