@@ -1,18 +1,18 @@
+import * as fs from "fs";
 import { ArticleSummaryApiDomain } from "mol-lib-api-contract/content/mobile-content";
 import "reflect-metadata";
 import { getArticlesAndSchemes, getServiceBundles, getServicesForBundle } from "./api";
+import { webScraper } from "./web-scraper";
 
-interface WebScraperInput {
+interface SentenceTransformerInput {
 	contentType: "service_bundles";
 	itemId: string;
 	title: string;
-	urls: string[];
-
-	/**
-	 * existing text from title/summary etc
-	 */
 	text: string;
+}
 
+interface WebScraperInput extends SentenceTransformerInput {
+	urls: string[];
 	scrapeExternalLinks: boolean;
 }
 
@@ -62,5 +62,29 @@ interface WebScraperInput {
 		}),
 	);
 
-	console.log(">>>", webScraperInput);
+	await webScraper.init();
+
+	const result: SentenceTransformerInput[] = [];
+
+	for await (const { contentType, itemId, title, text, urls, scrapeExternalLinks } of webScraperInput) {
+		console.log(`Crawling data for "${title}" (itemId: ${itemId})...`);
+		// all urls in one item
+		const data: string[] = [];
+		for await (const url of urls) {
+			const scraped = await webScraper.scrape(url, scrapeExternalLinks);
+			data.push(scraped);
+		}
+
+		result.push({
+			contentType,
+			itemId,
+			text: text + " " + data.join(" "),
+			title,
+		});
+
+		console.log(`Finished crawling "${title}"!\n\n`);
+	}
+	await webScraper.close();
+
+	fs.writeFileSync(`output.json`, JSON.stringify(result, undefined, 2));
 })();

@@ -1,6 +1,9 @@
 {
 	"extends": "./node_modules/mol-lib-config/shared-config/tsconfig.json",
 	"compilerOptions": {
-		"module": "commonjs"
+		"module": "commonjs",
+		"lib": [
+			"dom"
+		]
 	}
 }
