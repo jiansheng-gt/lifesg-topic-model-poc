@@ -1,15 +1,6 @@
+import { ArticleSummaryApiDomain } from "mol-lib-api-contract/content/mobile-content";
 import "reflect-metadata";
-import { RequestEndpoint } from "mol-lib-common";
-import { plainToInstance } from "class-transformer";
-import {
-	ArticleSummaryApiDomain,
-	GetBundledArticlesAndSchemes,
-	GetServiceBundleResponseBodyApiDomain,
-	getServiceBundlesServiceApi,
-	GetServicesForBundleWithOptionsResponseBodyApiDomain,
-	getServicesForBundleWithOptionsServiceApi,
-} from "mol-lib-api-contract/content/mobile-content";
-import { Language } from "mol-lib-api-contract";
+import { getArticlesAndSchemes, getServiceBundles, getServicesForBundle } from "./api";
 
 interface WebScraperInput {
 	contentType: "service_bundles";
@@ -25,14 +16,8 @@ interface WebScraperInput {
 	scrapeExternalLinks: boolean;
 }
 
-const run = async () => {
-	const { body } = await new RequestEndpoint()
-		.setBaseUrl("https://www.dev.lifesg.io")
-		.setOptions({
-			json: true,
-		})
-		.get(getServiceBundlesServiceApi.path);
-	const serviceBundles = plainToInstance(GetServiceBundleResponseBodyApiDomain, body).data;
+(async () => {
+	const serviceBundles = await getServiceBundles();
 
 	const webScraperInput = await Promise.all(
 		serviceBundles.map<Promise<WebScraperInput>>(async ({ id, title, serviceBundleUrl, topics, audiences }) => {
@@ -48,21 +33,7 @@ const run = async () => {
 			}
 
 			// get data of services within bundle
-			const servicesResponse = await new RequestEndpoint()
-				.setBaseUrl("https://www.dev.lifesg.io")
-				.setOptions({
-					json: true,
-				})
-				.get(getServicesForBundleWithOptionsServiceApi.path, {
-					params: {
-						serviceBundleId: id,
-						type: "all",
-					},
-				});
-			const services = plainToInstance(
-				GetServicesForBundleWithOptionsResponseBodyApiDomain,
-				servicesResponse.body.data,
-			);
+			const services = await getServicesForBundle(id);
 
 			const textsArr = [];
 
@@ -76,26 +47,7 @@ const run = async () => {
 			});
 
 			// get related articles/schemes
-			const articlesAndSchemesResponse = await new RequestEndpoint()
-				.setBaseUrl("https://www.dev.lifesg.io")
-				.setOptions({
-					json: true,
-				})
-				.post("/content/api/v1/queryBundledArticlesAndSchemes", {
-					body: GetBundledArticlesAndSchemes.Transformers.transformGetBundledArticlesAndSchemesRequestApiDtoToDomain(
-						{
-							language: Language.MOLLanguage.ENGLISH,
-							topics,
-							targetAudiences: audiences,
-							limit: 5,
-						},
-					),
-				});
-
-			const articlesAndSchemes =
-				GetBundledArticlesAndSchemes.Transformers.transformGetBundledArticlesAndSchemesResponseApiDtoToDomain(
-					articlesAndSchemesResponse.body,
-				);
+			const articlesAndSchemes = await getArticlesAndSchemes(topics, audiences);
 
 			return {
 				contentType: "service_bundles",
@@ -111,6 +63,4 @@ const run = async () => {
 	);
 
 	console.log(">>>", webScraperInput);
-};
-
-run();
+})();
