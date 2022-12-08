@@ -1,8 +1,11 @@
 import * as fs from "fs";
 import { ArticleSummaryApiDomain } from "mol-lib-api-contract/content/mobile-content";
+import * as path from "path";
 import "reflect-metadata";
 import { getArticlesAndSchemes, getServiceBundles, getServicesForBundle } from "./api";
 import { webScraper } from "./web-scraper";
+
+const OUTPUT_DIR = path.resolve(__dirname, "../data");
 
 interface SentenceTransformerInput {
 	contentType: "service_bundles";
@@ -66,8 +69,8 @@ interface WebScraperInput extends SentenceTransformerInput {
 
 	const result: SentenceTransformerInput[] = [];
 
-	for await (const { contentType, itemId, title, text, urls, scrapeExternalLinks } of webScraperInput) {
-		console.log(`Crawling data for "${title}" (itemId: ${itemId})...`);
+	for await (const [index, { contentType, itemId, title, text, urls, scrapeExternalLinks }] of webScraperInput.entries()) {
+		console.log(`[${index + 1}/${webScraperInput.length}] Crawling data for "${title}" (itemId: ${itemId})...`);
 		// all urls in one item
 		const data: string[] = [];
 		for await (const url of urls) {
@@ -86,5 +89,10 @@ interface WebScraperInput extends SentenceTransformerInput {
 	}
 	await webScraper.close();
 
-	fs.writeFileSync(`output.json`, JSON.stringify(result, undefined, 2));
+	if (!fs.existsSync(OUTPUT_DIR)) {
+		fs.mkdirSync(OUTPUT_DIR);
+	}
+
+	fs.writeFileSync(path.resolve(OUTPUT_DIR, "scraper-results.json"), JSON.stringify(result, undefined, 2));
 })();
+

@@ -69,10 +69,10 @@ class WebScraper {
 		const pageData = guidesElement1.length
 			? guidesElement1
 			: guidesElement2.length
-			? guidesElement2
-			: servicesElement.length
-			? servicesElement
-			: null;
+				? guidesElement2
+				: servicesElement.length
+					? servicesElement
+					: null;
 
 		if (!pageData) {
 			return this.processPage($);
@@ -96,7 +96,8 @@ class WebScraper {
 	private async scrapeExternalLinks(links: string[]) {
 		const externalDocs: string[] = [];
 
-		for await (const url of links) {
+		for await (const [index, url] of links.entries()) {
+			console.log(`Crawling external link ${index + 1} out of ${links.length}`)
 			if (
 				!url ||
 				!url.startsWith("http") ||

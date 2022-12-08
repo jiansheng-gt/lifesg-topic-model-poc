@@ -7,14 +7,13 @@ import {
 	GetServiceBundleResponseBodyApiDomain,
 	getServiceBundlesServiceApi,
 	GetServicesForBundleWithOptionsResponseBodyApiDomain,
-	getServicesForBundleWithOptionsServiceApi,
+	getServicesForBundleWithOptionsServiceApi
 } from "mol-lib-api-contract/content/mobile-content";
-
-const LIFESG_BASE_URL = "https://www.dev.lifesg.io";
+import { appConfig } from "./config/app-config";
 
 const createClient = () =>
 	axios.create({
-		baseURL: LIFESG_BASE_URL,
+		baseURL: appConfig.baseUrl,
 	});
 
 export const getServiceBundles = async () => {
