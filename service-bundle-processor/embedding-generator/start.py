@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import sys
-from typing import Literal, TypedDict
+from typing import TypedDict
 
 sys.path.append(os.getcwd())
 
@@ -77,25 +77,12 @@ Payload = TypedDict(
 		'embeddings': EmbOutput
 	}
 )
-JsonOutput = TypedDict(
-	'JsonOutput',
-	{
-		'type': Literal['LEVEL_3'],
-		'payload': Payload
-	}
-)
-result: JsonOutput = {
-	'type': 'LEVEL_3',
-	'payload': {
-		'impressionMultiplier': -0.2,
-		'redshiftWeightage': 0.2,
-		'embeddings': []
-	}
-}
+
+result: EmbOutput = []
 
 for index, doc_info in enumerate(documents):
 	embedding_arr = np.array(embeddings[index])
-	result['payload']['embeddings'].append({
+	result.append({
 		'contentType': doc_info['contentType'],
 		'itemId': doc_info['itemId'],
 		'title': doc_info['title'],

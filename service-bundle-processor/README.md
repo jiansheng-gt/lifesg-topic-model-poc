@@ -44,7 +44,7 @@ pip3 install -r requirements.txt
 npm run scrape
 ```
 
-2. Run embedding generator. Output will be in `data/embeddings.json`. This is the variant data that can be copied into mol-personalise DB.
+2. Run embedding generator. Output will be in `data/embeddings.json`. This json should be copied into mol-personalise scripts to generate the payload.
 
 ```
 npm run embedding:generate
