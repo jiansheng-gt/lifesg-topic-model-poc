@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import { EServiceApiDomain } from "mol-lib-api-contract/content/mobile-content";
 import * as path from "path";
 import "reflect-metadata";
 import { getEServiceGroupDetail, getEServiceGroups, getServicesForBundle } from "./api";
@@ -21,7 +22,7 @@ interface WebScraperInput extends SentenceTransformerInput {
 (async () => {
 	const { eserviceGroups } = await getEServiceGroups();
 
-	const eServices = [];
+	const eServices: EServiceApiDomain[] = [];
 	for (const group of eserviceGroups) {
 		const service = await getEServiceGroupDetail(group.id);
 		for (const subGroup of service.eserviceGroup.subGroups) {
@@ -42,7 +43,7 @@ interface WebScraperInput extends SentenceTransformerInput {
 				};
 			}
 
-			const textsArr = [];
+			const textsArr: string[] = [];
 
 			// add title, subtitle, summary to text
 			textsArr.push(title, subtitle, summary);
