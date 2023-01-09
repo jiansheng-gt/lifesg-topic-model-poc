@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"scrape": "ts-node scraper/index.ts",
+		"scrape": "ts-node scraper/eservices-scraper.ts",
 		"embedding:generate": "python embedding-generator/start.py"
 	},
 	"author": "",

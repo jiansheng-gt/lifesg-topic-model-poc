@@ -21,6 +21,7 @@ class WebScraper {
 		const documents: string[] = [];
 		let externalDocuments: string[];
 		const html = await this.fetchHtml(url);
+
 		if (!html) {
 			console.log("Error occurred while fetching data");
 			return;
@@ -69,10 +70,10 @@ class WebScraper {
 		const pageData = guidesElement1.length
 			? guidesElement1
 			: guidesElement2.length
-				? guidesElement2
-				: servicesElement.length
-					? servicesElement
-					: null;
+			? guidesElement2
+			: servicesElement.length
+			? servicesElement
+			: null;
 
 		if (!pageData) {
 			return this.processPage($);
@@ -97,7 +98,7 @@ class WebScraper {
 		const externalDocs: string[] = [];
 
 		for await (const [index, url] of links.entries()) {
-			console.log(`Crawling external link ${index + 1} out of ${links.length}`)
+			console.log(`Crawling external link ${index + 1} out of ${links.length}`);
 			if (
 				!url ||
 				!url.startsWith("http") ||
@@ -132,6 +133,11 @@ class WebScraper {
 				return;
 			}
 
+			if (this.isSingpassLink(res.url())) {
+				console.log("Singpass login detected");
+				return;
+			}
+
 			const bodyHTML = await this.page.evaluate(() => document.body.innerHTML);
 
 			if (
@@ -148,6 +154,12 @@ class WebScraper {
 			return;
 		}
 	}
+
+	private isSingpassLink = (url: string) => {
+		const singpassSamLink = "saml.singpass.gov.sg";
+		const singpassLoginLink = "login.singpass.gov.sg";
+		return !!url?.includes(singpassSamLink) || !!url?.includes(singpassLoginLink);
+	};
 }
 
 export const webScraper = new WebScraper();
