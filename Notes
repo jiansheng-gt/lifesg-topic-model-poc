@@ -1,0 +1,34 @@
+AWS Comprehend
+- seems expensive: https://aws.amazon.com/comprehend/pricing/
+- trained using a very large dataset
+- topic modeling doesn't support chinese (individual characters), limited supported for tamil?
+
+monkeylearn?
+
+google autoML nlp
+https://cloud.google.com/natural-language/automl/docs/prepare
+
+
+
+self code: https://towardsdatascience.com/topic-modeling-with-latent-dirichlet-allocation-by-example-3b22cd10c835
+- usually using LDA, sometimes LSI/LSA?
+1) remove stopwords
+2) tokenize
+
+https://www.machinelearningplus.com/nlp/topic-modeling-gensim-python/
+tutorial using gensim - https://neptune.ai/blog/latent-dirichlet-allocation-lda-tutorial-topic-modeling
+topic modeling python library? https://radimrehurek.com/gensim/
+
+
+scikitlearn vs gensim
+https://medium.com/@benzgreer/sklearn-lda-vs-gensim-lda-691a9f2e9ab7
+https://github.com/RaRe-Technologies/gensim/issues/457
+
+slightly different method
+https://towardsdatascience.com/topic-modelling-in-python-with-nltk-and-gensim-4ef03213cd21
+
+
+using ML/NN - transformers/BERT/huggingface
+https://www.sbert.net/docs/pretrained_models.html
+https://huggingface.co/docs/transformers/index
+https://neptune.ai/blog/hugging-face-pre-trained-models-find-the-best

@@ -38,7 +38,7 @@ interface WebScraperInput extends SentenceTransformerInput {
 			// get data of services within bundle
 			const services = await getServicesForBundle(id);
 
-			const textsArr = [];
+			const textsArr: string[] = [];
 
 			// add title, subtitle, summary to text
 			services.featuredServices.forEach(({ title, subtitle, summary }) => {
@@ -69,7 +69,10 @@ interface WebScraperInput extends SentenceTransformerInput {
 
 	const result: SentenceTransformerInput[] = [];
 
-	for await (const [index, { contentType, itemId, title, text, urls, scrapeExternalLinks }] of webScraperInput.entries()) {
+	for await (const [
+		index,
+		{ contentType, itemId, title, text, urls, scrapeExternalLinks },
+	] of webScraperInput.entries()) {
 		console.log(`[${index + 1}/${webScraperInput.length}] Crawling data for "${title}" (itemId: ${itemId})...`);
 		// all urls in one item
 		const data: string[] = [];
@@ -95,4 +98,3 @@ interface WebScraperInput extends SentenceTransformerInput {
 
 	fs.writeFileSync(path.resolve(OUTPUT_DIR, "scraper-results.json"), JSON.stringify(result, undefined, 2));
 })();
-

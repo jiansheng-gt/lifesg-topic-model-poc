@@ -36,12 +36,18 @@ source venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
-# Generating service bundles embeddings
+# Generating service bundles/eservice embeddings
 
-1. Run scraper. This scrapes all service bundles that are currently published. Output will be in `data/scraper-results.json`.
+1. Run relevant scraper. This scrapes all content that are currently published. Output will be in `data/scraper-results.json`.
 
 ```
-npm run scrape
+npm run scrape:eservices
+```
+
+OR
+
+```
+npm run scrape:service-bundles
 ```
 
 2. Run embedding generator. Output will be in `data/embeddings.json`. This json should be copied into mol-personalise scripts to generate the payload.

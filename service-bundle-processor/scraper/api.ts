@@ -7,8 +7,10 @@ import {
 	GetServiceBundleResponseBodyApiDomain,
 	getServiceBundlesServiceApi,
 	GetServicesForBundleWithOptionsResponseBodyApiDomain,
-	getServicesForBundleWithOptionsServiceApi
+	getServicesForBundleWithOptionsServiceApi,
 } from "mol-lib-api-contract/content/mobile-content";
+import { GetEServiceGroupDetailResponseDataApiDomain } from "mol-lib-api-contract/content/mobile-content/get-eservice-detail/get-eservice-group-detail-api-domain";
+import { GetEServiceGroupResponseDataApiDomain } from "mol-lib-api-contract/content/mobile-content/get-eservice-summaries/get-eservice-summaries-api-domain";
 import { appConfig } from "./config/app-config";
 
 const createClient = () =>
@@ -29,6 +31,16 @@ export const getServicesForBundle = async (serviceBundleId: string) => {
 		},
 	});
 	return plainToInstance(GetServicesForBundleWithOptionsResponseBodyApiDomain, data.data);
+};
+
+export const getEServiceGroups = async () => {
+	const { data } = await createClient().get("/content/api/v2/queryEServiceGroups");
+	return plainToInstance(GetEServiceGroupResponseDataApiDomain, data.data);
+};
+
+export const getEServiceGroupDetail = async (groupId: string) => {
+	const { data } = await createClient().get(`/content/api/v2/queryEServiceGroupDetail/${groupId}`);
+	return plainToInstance(GetEServiceGroupDetailResponseDataApiDomain, data.data);
 };
 
 export const getArticlesAndSchemes = async (topics: Topic[], targetAudiences: TargetAudience[]) => {
