@@ -7,7 +7,7 @@ import { webScraper } from "./web-scraper";
 const OUTPUT_DIR = path.resolve(__dirname, "../data");
 
 interface SentenceTransformerInput {
-	contentType: "services";
+	contentType: "eservices";
 	itemId: string;
 	title: string;
 	text: string;
@@ -33,7 +33,7 @@ interface WebScraperInput extends SentenceTransformerInput {
 		eServices.map<Promise<WebScraperInput>>(async ({ id, title, action, subtitle, summary }) => {
 			if (action.payload.url && action.payload.url !== "appNavigation") {
 				return {
-					contentType: "services",
+					contentType: "eservices",
 					itemId: id,
 					title,
 					urls: [action.payload.url],
@@ -48,7 +48,7 @@ interface WebScraperInput extends SentenceTransformerInput {
 			textsArr.push(title, subtitle, summary);
 
 			return {
-				contentType: "services",
+				contentType: "eservices",
 				itemId: id,
 				title,
 				urls: [],
