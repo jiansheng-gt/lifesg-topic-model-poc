@@ -1,11 +1,7 @@
-import * as fs from "fs";
 import { ArticleSummaryApiDomain } from "mol-lib-api-contract/content/mobile-content";
-import * as path from "path";
 import "reflect-metadata";
 import { getArticlesAndSchemes, getServiceBundles, getServicesForBundle } from "./api";
 import { webScraper } from "./web-scraper";
-
-const OUTPUT_DIR = path.resolve(__dirname, "../data");
 
 interface SentenceTransformerInput {
 	contentType: "service_bundles";
@@ -19,7 +15,7 @@ interface WebScraperInput extends SentenceTransformerInput {
 	scrapeExternalLinks: boolean;
 }
 
-(async () => {
+export const ServiceBundleScraper = async () => {
 	const serviceBundles = await getServiceBundles();
 
 	const webScraperInput = await Promise.all(
@@ -92,9 +88,5 @@ interface WebScraperInput extends SentenceTransformerInput {
 	}
 	await webScraper.close();
 
-	if (!fs.existsSync(OUTPUT_DIR)) {
-		fs.mkdirSync(OUTPUT_DIR);
-	}
-
-	fs.writeFileSync(path.resolve(OUTPUT_DIR, "scraper-results.json"), JSON.stringify(result, undefined, 2));
-})();
+	return result;
+};
