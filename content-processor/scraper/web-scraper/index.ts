@@ -48,7 +48,13 @@ class WebScraper {
 	private processPage($: CheerioAPI) {
 		// Append spaces in between elements to prevent text clumping
 		$("*").each(function () {
-			$(this).append(" ");
+			let display = $(this).css("display");
+
+			if (display === "none") {
+				$(this).remove();
+			} else {
+				$(this).append(" ");
+			}
 		});
 
 		$("header").remove();

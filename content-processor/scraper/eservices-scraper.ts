@@ -1,11 +1,7 @@
-import * as fs from "fs";
 import { EServiceApiDomain } from "mol-lib-api-contract/content/mobile-content";
-import * as path from "path";
 import "reflect-metadata";
-import { getEServiceGroupDetail, getEServiceGroups, getServicesForBundle } from "./api";
+import { getEServiceGroupDetail, getEServiceGroups } from "./api";
 import { webScraper } from "./web-scraper";
-
-const OUTPUT_DIR = path.resolve(__dirname, "../data");
 
 interface SentenceTransformerInput {
 	contentType: "eservices";
@@ -19,7 +15,7 @@ interface WebScraperInput extends SentenceTransformerInput {
 	scrapeExternalLinks: boolean;
 }
 
-(async () => {
+export const EservicesScraper = async () => {
 	const { eserviceGroups } = await getEServiceGroups();
 
 	const eServices: EServiceApiDomain[] = [];
@@ -86,9 +82,5 @@ interface WebScraperInput extends SentenceTransformerInput {
 	}
 	await webScraper.close();
 
-	if (!fs.existsSync(OUTPUT_DIR)) {
-		fs.mkdirSync(OUTPUT_DIR);
-	}
-
-	fs.writeFileSync(path.resolve(OUTPUT_DIR, "scraper-results.json"), JSON.stringify(result, undefined, 2));
-})();
+	return result;
+};
