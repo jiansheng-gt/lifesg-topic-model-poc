@@ -28,28 +28,29 @@ export const EservicesScraper = async () => {
 
 	const webScraperInput = await Promise.all(
 		eServices.map<Promise<WebScraperInput>>(async ({ id, title, action, subtitle, summary }) => {
+			// add title, subtitle, summary to text
+			const initialTexts = [title, subtitle, summary]
+				.filter((val) => val.length > 0)
+				.join(" ").trim();
+
+			const baseInput = {
+				contentType: "eservices" as const,
+				itemId: id,
+				title,
+				text: initialTexts,
+			}
+
 			if (action.payload.url && action.payload.url !== "appNavigation") {
 				return {
-					contentType: "eservices",
-					itemId: id,
-					title,
+					...baseInput,
 					urls: [action.payload.url],
-					text: "",
 					scrapeExternalLinks: true,
 				};
 			}
 
-			const textsArr: string[] = [];
-
-			// add title, subtitle, summary to text
-			textsArr.push(title, subtitle, summary);
-
 			return {
-				contentType: "eservices",
-				itemId: id,
-				title,
+				...baseInput,
 				urls: [],
-				text: textsArr.filter((val) => val.length > 0).join(" "),
 				scrapeExternalLinks: false,
 			};
 		}),
