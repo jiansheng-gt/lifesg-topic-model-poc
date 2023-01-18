@@ -38,16 +38,10 @@ pip3 install -r requirements.txt
 
 # Generating service bundles/eservice embeddings
 
-1. Run relevant scraper. This scrapes all content that are currently published. Output will be in `data/scraper-results.json`.
+1. Run scraper. This scrapes all content that are currently published. Scraped data is cached so this script can be safely stopped and resumed at a later time. Output will be in `data/scraper-results.json`.
 
 ```
-npm run scrape:eservices
-```
-
-OR
-
-```
-npm run scrape:service-bundles
+npm run scrape
 ```
 
 2. Run embedding generator. Output will be in `data/embeddings.json`. This json should be copied into mol-personalise scripts to generate the payload.

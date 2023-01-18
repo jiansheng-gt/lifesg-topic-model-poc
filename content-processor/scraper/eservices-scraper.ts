@@ -1,8 +1,11 @@
 import { EServiceApiDomain } from "mol-lib-api-contract/content/mobile-content";
+import * as path from "path";
 import "reflect-metadata";
 import { getEServiceGroupDetail, getEServiceGroups } from "./api";
+import { CachedScraper } from "./CachedScraper";
 import { webScraper } from "./web-scraper";
 
+const CACHE_DIR = path.resolve(__dirname, "../data/cache/eservice");
 interface SentenceTransformerInput {
 	contentType: "eservices";
 	itemId: string;
@@ -16,6 +19,10 @@ interface WebScraperInput extends SentenceTransformerInput {
 }
 
 export const EservicesScraper = async () => {
+	const cachedScraper = new CachedScraper<SentenceTransformerInput>(CACHE_DIR);
+	const scrapedIds = cachedScraper.getScrapedIds();
+
+	// TODO: get all eservices including hidden ones
 	const { eserviceGroups } = await getEServiceGroups();
 
 	const eServices: EServiceApiDomain[] = [];
@@ -58,13 +65,17 @@ export const EservicesScraper = async () => {
 
 	await webScraper.init();
 
-	const result: SentenceTransformerInput[] = [];
-
 	for await (const [
 		index,
 		{ contentType, itemId, title, text, urls, scrapeExternalLinks },
 	] of webScraperInput.entries()) {
 		console.log(`[${index + 1}/${webScraperInput.length}] Crawling data for "${title}" (itemId: ${itemId})...`);
+
+		if (scrapedIds.includes(itemId)) {
+			console.log("Already crawled, skipping");
+			continue;
+		}
+
 		// all urls in one item
 		const data: string[] = [];
 		for await (const url of urls) {
@@ -72,16 +83,19 @@ export const EservicesScraper = async () => {
 			data.push(scraped);
 		}
 
-		result.push({
+		const result: SentenceTransformerInput = {
 			contentType,
 			itemId,
 			text: text + " " + data.join(" "),
 			title,
-		});
+		};
 
+		cachedScraper.saveToCache(result, itemId, `${index + 1}-${itemId}`);
 		console.log(`Finished crawling "${title}"!\n\n`);
 	}
 	await webScraper.close();
+
+	const result = cachedScraper.getCache();
 
 	return result;
 };

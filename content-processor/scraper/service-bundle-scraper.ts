@@ -1,7 +1,11 @@
 import { ArticleSummaryApiDomain } from "mol-lib-api-contract/content/mobile-content";
+import * as path from "path";
 import "reflect-metadata";
 import { getArticlesAndSchemes, getServiceBundles, getServicesForBundle } from "./api";
+import { CachedScraper } from "./CachedScraper";
 import { webScraper } from "./web-scraper";
+
+const CACHE_DIR = path.resolve(__dirname, "../data/cache/service-bundle");
 
 interface SentenceTransformerInput {
 	contentType: "service_bundles";
@@ -16,17 +20,25 @@ interface WebScraperInput extends SentenceTransformerInput {
 }
 
 export const ServiceBundleScraper = async () => {
+	const cachedScraper = new CachedScraper<SentenceTransformerInput>(CACHE_DIR);
+	const scrapedIds = cachedScraper.getScrapedIds();
+
 	const serviceBundles = await getServiceBundles();
 
 	const webScraperInput = await Promise.all(
-		serviceBundles.map<Promise<WebScraperInput>>(async ({ id, title, serviceBundleUrl, topics, audiences }) => {
+		serviceBundles.map<Promise<WebScraperInput>>(async ({ id, title, summary, serviceBundleUrl, topics, audiences }) => {
+			// add title, summary to text
+			const initialTexts = [title, summary]
+				.filter((val) => val.length > 0)
+				.join(" ").trim();
+
 			if (serviceBundleUrl) {
 				return {
 					contentType: "service_bundles",
 					itemId: id,
 					title,
 					urls: [serviceBundleUrl],
-					text: "",
+					text: initialTexts,
 					scrapeExternalLinks: true,
 				};
 			}
@@ -34,7 +46,7 @@ export const ServiceBundleScraper = async () => {
 			// get data of services within bundle
 			const services = await getServicesForBundle(id);
 
-			const textsArr: string[] = [];
+			const textsArr: string[] = [initialTexts];
 
 			// add title, subtitle, summary to text
 			services.featuredServices.forEach(({ title, subtitle, summary }) => {
@@ -63,13 +75,17 @@ export const ServiceBundleScraper = async () => {
 
 	await webScraper.init();
 
-	const result: SentenceTransformerInput[] = [];
-
 	for await (const [
 		index,
 		{ contentType, itemId, title, text, urls, scrapeExternalLinks },
 	] of webScraperInput.entries()) {
 		console.log(`[${index + 1}/${webScraperInput.length}] Crawling data for "${title}" (itemId: ${itemId})...`);
+
+		if (scrapedIds.includes(itemId)) {
+			console.log("Already crawled, skipping")
+			continue;
+		}
+
 		// all urls in one item
 		const data: string[] = [];
 		for await (const url of urls) {
@@ -77,16 +93,19 @@ export const ServiceBundleScraper = async () => {
 			data.push(scraped);
 		}
 
-		result.push({
+		const result: SentenceTransformerInput = {
 			contentType,
 			itemId,
 			text: text + " " + data.join(" "),
 			title,
-		});
+		};
 
+		cachedScraper.saveToCache(result, itemId, `${index + 1}-${itemId}`);
 		console.log(`Finished crawling "${title}"!\n\n`);
 	}
 	await webScraper.close();
+
+	const result = cachedScraper.getCache();
 
 	return result;
 };
