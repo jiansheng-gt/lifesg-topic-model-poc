@@ -1,7 +1,7 @@
 import { EServiceApiDomain } from "mol-lib-api-contract/content/mobile-content";
 import * as path from "path";
 import "reflect-metadata";
-import { getEServiceGroupDetail, getEServiceGroups } from "./api";
+import { api } from "./api";
 import { CachedScraper } from "./CachedScraper";
 import { webScraper } from "./web-scraper";
 
@@ -23,11 +23,11 @@ export const EservicesScraper = async () => {
 	const scrapedIds = cachedScraper.getScrapedIds();
 
 	// TODO: get all eservices including hidden ones
-	const { eserviceGroups } = await getEServiceGroups();
+	const { eserviceGroups } = await api.getEServiceGroups();
 
 	const eServices: EServiceApiDomain[] = [];
 	for (const group of eserviceGroups) {
-		const service = await getEServiceGroupDetail(group.id);
+		const service = await api.getEServiceGroupDetail(group.id);
 		for (const subGroup of service.eserviceGroup.subGroups) {
 			eServices.push(...subGroup.services);
 		}

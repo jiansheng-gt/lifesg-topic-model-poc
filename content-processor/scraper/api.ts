@@ -13,46 +13,55 @@ import { GetEServiceGroupDetailResponseDataApiDomain } from "mol-lib-api-contrac
 import { GetEServiceGroupResponseDataApiDomain } from "mol-lib-api-contract/content/mobile-content/get-eservice-summaries/get-eservice-summaries-api-domain";
 import { appConfig } from "./config/app-config";
 
-const createClient = () =>
-	axios.create({
-		baseURL: appConfig.baseUrl,
-	});
+export class Api {
+	constructor(private readonly baseUrl = appConfig.baseUrl) {
 
-export const getServiceBundles = async () => {
-	const { data } = await createClient().get(getServiceBundlesServiceApi.path);
-	return plainToInstance(GetServiceBundleResponseBodyApiDomain, data).data;
-};
+	}
 
-export const getServicesForBundle = async (serviceBundleId: string) => {
-	const { data } = await createClient().get(getServicesForBundleWithOptionsServiceApi.path, {
-		params: {
-			serviceBundleId,
-			type: "all",
-		},
-	});
-	return plainToInstance(GetServicesForBundleWithOptionsResponseBodyApiDomain, data.data);
-};
+	private createClient = () =>
+		axios.create({
+			baseURL: this.baseUrl,
+		});
 
-export const getEServiceGroups = async () => {
-	const { data } = await createClient().get("/content/api/v2/queryEServiceGroups");
-	return plainToInstance(GetEServiceGroupResponseDataApiDomain, data.data);
-};
+	public getServiceBundles = async () => {
+		const { data } = await this.createClient().get(getServiceBundlesServiceApi.path);
+		return plainToInstance(GetServiceBundleResponseBodyApiDomain, data).data;
+	};
 
-export const getEServiceGroupDetail = async (groupId: string) => {
-	const { data } = await createClient().get(`/content/api/v2/queryEServiceGroupDetail/${groupId}`);
-	return plainToInstance(GetEServiceGroupDetailResponseDataApiDomain, data.data);
-};
+	public getServicesForBundle = async (serviceBundleId: string) => {
+		const { data } = await this.createClient().get(getServicesForBundleWithOptionsServiceApi.path, {
+			params: {
+				serviceBundleId,
+				type: "all",
+			},
+		});
+		return plainToInstance(GetServicesForBundleWithOptionsResponseBodyApiDomain, data.data);
+	};
 
-export const getArticlesAndSchemes = async (topics: Topic[], targetAudiences: TargetAudience[]) => {
-	const { data } = await createClient().post(
-		"/content/api/v1/queryBundledArticlesAndSchemes",
-		GetBundledArticlesAndSchemes.Transformers.transformGetBundledArticlesAndSchemesRequestApiDomainToDto({
-			language: Language.MOLLanguage.ENGLISH,
-			topics,
-			targetAudiences,
-			limit: 5,
-		}),
-	);
+	public getEServiceGroups = async () => {
+		const { data } = await this.createClient().get("/content/api/v2/queryEServiceGroups");
+		return plainToInstance(GetEServiceGroupResponseDataApiDomain, data.data);
+	};
 
-	return GetBundledArticlesAndSchemes.Transformers.transformGetBundledArticlesAndSchemesResponseApiDtoToDomain(data);
-};
+	public getEServiceGroupDetail = async (groupId: string) => {
+		const { data } = await this.createClient().get(`/content/api/v2/queryEServiceGroupDetail/${groupId}`);
+		return plainToInstance(GetEServiceGroupDetailResponseDataApiDomain, data.data);
+	};
+
+	public getArticlesAndSchemes = async (topics: Topic[], targetAudiences: TargetAudience[]) => {
+		const { data } = await this.createClient().post(
+			"/content/api/v1/queryBundledArticlesAndSchemes",
+			GetBundledArticlesAndSchemes.Transformers.transformGetBundledArticlesAndSchemesRequestApiDomainToDto({
+				language: Language.MOLLanguage.ENGLISH,
+				topics,
+				targetAudiences,
+				limit: 5,
+			}),
+		);
+
+		return GetBundledArticlesAndSchemes.Transformers.transformGetBundledArticlesAndSchemesResponseApiDtoToDomain(data);
+	};
+
+}
+
+export const api = new Api();

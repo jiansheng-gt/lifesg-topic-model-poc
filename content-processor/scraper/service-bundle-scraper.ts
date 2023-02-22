@@ -1,7 +1,7 @@
 import { ArticleSummaryApiDomain } from "mol-lib-api-contract/content/mobile-content";
 import * as path from "path";
 import "reflect-metadata";
-import { getArticlesAndSchemes, getServiceBundles, getServicesForBundle } from "./api";
+import { api } from "./api";
 import { CachedScraper } from "./CachedScraper";
 import { webScraper } from "./web-scraper";
 
@@ -23,7 +23,7 @@ export const ServiceBundleScraper = async () => {
 	const cachedScraper = new CachedScraper<SentenceTransformerInput>(CACHE_DIR);
 	const scrapedIds = cachedScraper.getScrapedIds();
 
-	const serviceBundles = await getServiceBundles();
+	const serviceBundles = await api.getServiceBundles();
 
 	const webScraperInput = await Promise.all(
 		serviceBundles.map<Promise<WebScraperInput>>(async ({ id, title, summary, serviceBundleUrl, topics, audiences }) => {
@@ -44,7 +44,7 @@ export const ServiceBundleScraper = async () => {
 			}
 
 			// get data of services within bundle
-			const services = await getServicesForBundle(id);
+			const services = await api.getServicesForBundle(id);
 
 			const textsArr: string[] = [initialTexts];
 
@@ -58,7 +58,7 @@ export const ServiceBundleScraper = async () => {
 			});
 
 			// get related articles/schemes
-			const articlesAndSchemes = await getArticlesAndSchemes(topics, audiences);
+			const articlesAndSchemes = await api.getArticlesAndSchemes(topics, audiences);
 
 			return {
 				contentType: "service_bundles",
